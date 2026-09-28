@@ -4,31 +4,63 @@ import {
     Clock3,
     WalletCards,
 } from 'lucide-react'
+import {
+    calculateDaysLeft,
+    getExpiryStatus,
+} from '../utils/dateUtils'
 
-const summaryItems = [
-    {
-        label: 'Total Items',
-        value: '12',
-        icon: CalendarDays,
-    },
-    {
-        label: 'Expiring Soon',
-        value: '3',
-        icon: Clock3,
-    },
-    {
-        label: 'Expired',
-        value: '1',
-        icon: CircleAlert,
-    },
-    {
-        label: 'Upcoming Cost',
-        value: 'RM 1,380',
-        icon: WalletCards,
-    },
-]
+function SummaryCards({ items }) {
+    const totalItems = items.length
 
-function SummaryCards() {
+    const expiringSoon = items.filter(
+        (item) => getExpiryStatus(item.expiryDate) === 'Expiring Soon',
+    ).length
+
+    const expired = items.filter(
+        (item) => getExpiryStatus(item.expiryDate) === 'Expired',
+    ).length
+
+    const upcomingCost = items.reduce((total, item) => {
+        const daysLeft = calculateDaysLeft(item.expiryDate)
+
+        const isUpcoming =
+            daysLeft !== null &&
+            daysLeft >= 0 &&
+            daysLeft <= 30
+
+        if (!isUpcoming || item.renewalCost === null) {
+            return total
+        }
+
+        return total + item.renewalCost
+    }, 0)
+
+    const summaryItems = [
+        {
+            label: 'Total Items',
+            value: totalItems,
+            icon: CalendarDays,
+        },
+        {
+            label: 'Expiring Soon',
+            value: expiringSoon,
+            icon: Clock3,
+        },
+        {
+            label: 'Expired',
+            value: expired,
+            icon: CircleAlert,
+        },
+        {
+            label: 'Upcoming Cost',
+            value: `RM ${upcomingCost.toLocaleString('en-MY', {
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 2,
+            })}`,
+            icon: WalletCards,
+        },
+    ]
+
     return (
         <section className="summary-section" aria-labelledby="overview-title">
             <div className="section-heading">

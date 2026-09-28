@@ -7,7 +7,13 @@ import ExpiryTable from './components/ExpiryTable'
 import ExpiryForm from './components/ExpiryForm'
 
 function App() {
+  const [items, setItems] = useState([])
   const [isFormOpen, setIsFormOpen] = useState(false)
+
+  const handleAddItem = (newItem) => {
+    setItems((currentItems) => [...currentItems, newItem])
+    setIsFormOpen(false)
+  }
 
   return (
     <>
@@ -32,7 +38,7 @@ function App() {
         </header>
 
         <main className="dashboard">
-          <SummaryCards />
+          <SummaryCards items={items} />
           <AttentionList />
 
           <section className="items-section" aria-labelledby="items-title">
@@ -44,13 +50,16 @@ function App() {
             </div>
 
             <ItemToolbar />
-            <ExpiryTable />
+            <ExpiryTable items={items} />
           </section>
         </main>
       </div>
 
       {isFormOpen && (
-        <ExpiryForm onClose={() => setIsFormOpen(false)} />
+        <ExpiryForm
+          onClose={() => setIsFormOpen(false)}
+          onSubmit={handleAddItem}
+        />
       )}
     </>
   )

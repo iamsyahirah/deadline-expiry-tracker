@@ -1,7 +1,45 @@
+import { useState } from 'react'
 import { X } from 'lucide-react'
 import { CATEGORIES } from '../data/categories'
 
-function ExpiryForm({ onClose }) {
+function ExpiryForm({ onClose, onSubmit }) {
+    const [formData, setFormData] = useState({
+        name: '',
+        category: '',
+        expiryDate: '',
+        renewalCost: '',
+        recurrence: 'none',
+    })
+
+    const handleChange = (event) => {
+        const { name, value } = event.target
+
+        setFormData((currentFormData) => ({
+            ...currentFormData,
+            [name]: value,
+        }))
+    }
+
+    const handleSubmit = (event) => {
+        event.preventDefault()
+
+        const newItem = {
+            id: crypto.randomUUID(),
+            name: formData.name.trim(),
+            category: formData.category,
+            expiryDate: formData.expiryDate,
+            renewalCost:
+                formData.renewalCost === ''
+                    ? null
+                    : Number(formData.renewalCost),
+            recurrence: formData.recurrence,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+        }
+
+        onSubmit(newItem)
+    }
+
     return (
         <div className="modal-backdrop" role="presentation">
             <section
@@ -26,7 +64,7 @@ function ExpiryForm({ onClose }) {
                     </button>
                 </div>
 
-                <form className="expiry-form">
+                <form className="expiry-form" onSubmit={handleSubmit}>
                     <div className="form-field">
                         <label htmlFor="name">Item Name</label>
                         <input
@@ -34,12 +72,21 @@ function ExpiryForm({ onClose }) {
                             name="name"
                             type="text"
                             placeholder="e.g. Car Insurance"
+                            value={formData.name}
+                            onChange={handleChange}
+                            required
                         />
                     </div>
 
                     <div className="form-field">
                         <label htmlFor="category">Category</label>
-                        <select id="category" name="category" defaultValue="">
+                        <select
+                            id="category"
+                            name="category"
+                            value={formData.category}
+                            onChange={handleChange}
+                            required
+                        >
                             <option value="" disabled>
                                 Select category
                             </option>
@@ -58,6 +105,9 @@ function ExpiryForm({ onClose }) {
                             id="expiryDate"
                             name="expiryDate"
                             type="date"
+                            value={formData.expiryDate}
+                            onChange={handleChange}
+                            required
                         />
                     </div>
 
@@ -76,6 +126,8 @@ function ExpiryForm({ onClose }) {
                                 min="0"
                                 step="0.01"
                                 placeholder="0.00"
+                                value={formData.renewalCost}
+                                onChange={handleChange}
                             />
                         </div>
                     </div>
@@ -85,7 +137,9 @@ function ExpiryForm({ onClose }) {
                         <select
                             id="recurrence"
                             name="recurrence"
-                            defaultValue="none"
+                            value={formData.recurrence}
+                            onChange={handleChange}
+                            required
                         >
                             <option value="none">None</option>
                             <option value="monthly">Monthly</option>
