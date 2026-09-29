@@ -7,7 +7,7 @@ import {
     getExpiryStatus,
 } from '../utils/dateUtils'
 
-function ExpiryTable({ items }) {
+function ExpiryTable({ items, onEdit, onDelete }) {
     return (
         <div className="table-wrapper">
             <table className="expiry-table">
@@ -55,6 +55,7 @@ function ExpiryTable({ items }) {
                                         <button
                                             className="icon-button"
                                             type="button"
+                                            onClick={() => onEdit(item)}
                                             aria-label={`Edit ${item.name}`}
                                         >
                                             <Pencil size={17} />
@@ -63,6 +64,7 @@ function ExpiryTable({ items }) {
                                         <button
                                             className="icon-button danger"
                                             type="button"
+                                            onClick={() => onDelete(item)}
                                             aria-label={`Delete ${item.name}`}
                                         >
                                             <Trash2 size={17} />

@@ -1,33 +1,45 @@
 import { AlertTriangle, CalendarDays } from 'lucide-react'
+import {
+    calculateDaysLeft,
+    formatDaysLeft,
+    getExpiryStatus,
+} from '../utils/dateUtils'
 
-const attentionItems = [
-    {
-        id: 1,
-        name: 'Domain',
-        category: 'Domain & Hosting',
-        daysLeft: 4,
-        cost: 60,
-        recurrence: 'Yearly',
-    },
-    {
-        id: 2,
-        name: 'Car Insurance',
-        category: 'Insurance',
-        daysLeft: 12,
-        cost: 1200,
-        recurrence: 'Yearly',
-    },
-    {
-        id: 3,
-        name: 'Hosting',
-        category: 'Domain & Hosting',
-        daysLeft: 25,
-        cost: 120,
-        recurrence: 'Yearly',
-    },
-]
+function AttentionList({ items }) {
+    const attentionItems = items
+        .map((item) => ({
+            ...item,
+            daysLeft: calculateDaysLeft(item.expiryDate),
+            status: getExpiryStatus(item.expiryDate),
+        }))
+        .filter(
+            (item) =>
+                item.status === 'Expired' ||
+                item.status === 'Expiring Soon',
+        )
+        .sort((a, b) => a.daysLeft - b.daysLeft)
+        .slice(0, 5)
 
-function AttentionList() {
+    if (attentionItems.length === 0) {
+        return (
+            <section
+                className="attention-section"
+                aria-labelledby="attention-title"
+            >
+                <div className="section-heading">
+                    <div>
+                        <h2 id="attention-title">Needs Attention</h2>
+                        <p>Items that are expiring soon and may require action.</p>
+                    </div>
+                </div>
+
+                <div className="attention-empty">
+                    <p>No urgent items right now.</p>
+                </div>
+            </section>
+        )
+    }
+
     return (
         <section className="attention-section" aria-labelledby="attention-title">
             <div className="section-heading">
@@ -52,19 +64,25 @@ function AttentionList() {
                                 </div>
 
                                 <span className="attention-days">
-                                    {item.daysLeft} days left
+                                    {formatDaysLeft(item.daysLeft)}
                                 </span>
                             </div>
 
                             <div className="attention-meta">
                                 <span>
                                     <CalendarDays size={15} />
-                                    {item.recurrence}
+                                    {item.recurrence === 'none'
+                                        ? 'No recurrence'
+                                        : item.recurrence === 'monthly'
+                                            ? 'Monthly'
+                                            : 'Yearly'}
                                 </span>
 
-                                <span>
-                                    RM {item.cost.toLocaleString('en-MY')}
-                                </span>
+                                {item.renewalCost !== null && (
+                                    <span>
+                                        RM {item.renewalCost.toLocaleString('en-MY')}
+                                    </span>
+                                )}
                             </div>
                         </div>
                     </article>

@@ -2,13 +2,15 @@ import { useState } from 'react'
 import { X } from 'lucide-react'
 import { CATEGORIES } from '../data/categories'
 
-function ExpiryForm({ onClose, onSubmit }) {
+function ExpiryForm({ onClose, onSubmit, initialData = null }) {
+    const isEditing = Boolean(initialData)
+
     const [formData, setFormData] = useState({
-        name: '',
-        category: '',
-        expiryDate: '',
-        renewalCost: '',
-        recurrence: 'none',
+        name: initialData?.name ?? '',
+        category: initialData?.category ?? '',
+        expiryDate: initialData?.expiryDate ?? '',
+        renewalCost: initialData?.renewalCost ?? '',
+        recurrence: initialData?.recurrence ?? 'none',
     })
 
     const handleChange = (event) => {
@@ -23,8 +25,9 @@ function ExpiryForm({ onClose, onSubmit }) {
     const handleSubmit = (event) => {
         event.preventDefault()
 
-        const newItem = {
-            id: crypto.randomUUID(),
+        const submittedItem = {
+            ...initialData,
+            id: initialData?.id ?? crypto.randomUUID(),
             name: formData.name.trim(),
             category: formData.category,
             expiryDate: formData.expiryDate,
@@ -33,11 +36,11 @@ function ExpiryForm({ onClose, onSubmit }) {
                     ? null
                     : Number(formData.renewalCost),
             recurrence: formData.recurrence,
-            createdAt: new Date().toISOString(),
+            createdAt: initialData?.createdAt ?? new Date().toISOString(),
             updatedAt: new Date().toISOString(),
         }
 
-        onSubmit(newItem)
+        onSubmit(submittedItem)
     }
 
     return (
@@ -50,8 +53,13 @@ function ExpiryForm({ onClose, onSubmit }) {
             >
                 <div className="modal-header">
                     <div>
-                        <p className="eyebrow">New expiry item</p>
-                        <h2 id="expiry-form-title">Add Item</h2>
+                        <p className="eyebrow">
+                            {isEditing ? 'Update expiry item' : 'New expiry item'}
+                        </p>
+
+                        <h2 id="expiry-form-title">
+                            {isEditing ? 'Edit Item' : 'Add Item'}
+                        </h2>
                     </div>
 
                     <button
@@ -80,6 +88,7 @@ function ExpiryForm({ onClose, onSubmit }) {
 
                     <div className="form-field">
                         <label htmlFor="category">Category</label>
+
                         <select
                             id="category"
                             name="category"
@@ -101,6 +110,7 @@ function ExpiryForm({ onClose, onSubmit }) {
 
                     <div className="form-field">
                         <label htmlFor="expiryDate">Expiry Date</label>
+
                         <input
                             id="expiryDate"
                             name="expiryDate"
@@ -119,6 +129,7 @@ function ExpiryForm({ onClose, onSubmit }) {
 
                         <div className="currency-input">
                             <span>RM</span>
+
                             <input
                                 id="renewalCost"
                                 name="renewalCost"
@@ -134,6 +145,7 @@ function ExpiryForm({ onClose, onSubmit }) {
 
                     <div className="form-field">
                         <label htmlFor="recurrence">Recurrence</label>
+
                         <select
                             id="recurrence"
                             name="recurrence"
@@ -157,7 +169,7 @@ function ExpiryForm({ onClose, onSubmit }) {
                         </button>
 
                         <button className="primary-button" type="submit">
-                            Save Item
+                            {isEditing ? 'Save Changes' : 'Save Item'}
                         </button>
                     </div>
                 </form>
