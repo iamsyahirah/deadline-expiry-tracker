@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Plus } from 'lucide-react'
 import SummaryCards from './components/SummaryCards'
 import AttentionList from './components/AttentionList'
@@ -6,12 +6,80 @@ import ItemToolbar from './components/ItemToolbar'
 import ExpiryTable from './components/ExpiryTable'
 import ExpiryForm from './components/ExpiryForm'
 import ConfirmDialog from './components/ConfirmDialog'
+import { getExpiryStatus, parseLocalDate } from './utils/dateUtils'
+
+const STORAGE_KEY = 'deadline-expiry-items'
 
 function App() {
-  const [items, setItems] = useState([])
+  const [items, setItems] = useState(() => {
+    const savedItems = localStorage.getItem(STORAGE_KEY)
+
+    if (!savedItems) {
+      return []
+    }
+
+    try {
+      return JSON.parse(savedItems)
+    } catch {
+      return []
+    }
+  })
+
   const [isFormOpen, setIsFormOpen] = useState(false)
   const [editingItem, setEditingItem] = useState(null)
   const [itemToDelete, setItemToDelete] = useState(null)
+  const [searchQuery, setSearchQuery] = useState('')
+  const [statusFilter, setStatusFilter] = useState('all')
+  const [sortOrder, setSortOrder] = useState('soonest')
+
+  useEffect(() => {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(items))
+  }, [items])
+
+  const visibleItems = items
+    .filter((item) => {
+      const normalizedSearch = searchQuery.trim().toLowerCase()
+
+      if (!normalizedSearch) {
+        return true
+      }
+
+      return (
+        item.name.toLowerCase().includes(normalizedSearch) ||
+        item.category.toLowerCase().includes(normalizedSearch)
+      )
+    })
+    .filter((item) => {
+      if (statusFilter === 'all') {
+        return true
+      }
+
+      const status = getExpiryStatus(item.expiryDate)
+
+      if (statusFilter === 'active') {
+        return status === 'Active'
+      }
+
+      if (statusFilter === 'expiring-soon') {
+        return status === 'Expiring Soon'
+      }
+
+      if (statusFilter === 'expired') {
+        return status === 'Expired'
+      }
+
+      return true
+    })
+    .sort((a, b) => {
+      const dateA = parseLocalDate(a.expiryDate)
+      const dateB = parseLocalDate(b.expiryDate)
+
+      if (sortOrder === 'latest') {
+        return dateB - dateA
+      }
+
+      return dateA - dateB
+    })
 
   const handleSaveItem = (itemToSave) => {
     setItems((currentItems) => {
@@ -91,9 +159,17 @@ function App() {
               </div>
             </div>
 
-            <ItemToolbar />
+            <ItemToolbar
+              searchQuery={searchQuery}
+              onSearchChange={setSearchQuery}
+              statusFilter={statusFilter}
+              onStatusFilterChange={setStatusFilter}
+              sortOrder={sortOrder}
+              onSortChange={setSortOrder}
+            />
             <ExpiryTable
-              items={items}
+              items={visibleItems}
+              totalItemCount={items.length}
               onEdit={handleEditItem}
               onDelete={handleDeleteRequest}
             />

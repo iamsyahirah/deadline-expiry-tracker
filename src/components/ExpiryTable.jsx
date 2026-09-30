@@ -6,8 +6,18 @@ import {
     formatExpiryDate,
     getExpiryStatus,
 } from '../utils/dateUtils'
+import EmptyState from './EmptyState'
 
-function ExpiryTable({ items, onEdit, onDelete }) {
+function ExpiryTable({
+    items,
+    totalItemCount,
+    onEdit,
+    onDelete,
+}) {
+
+    if (items.length === 0) {
+        return <EmptyState hasItems={totalItemCount > 0} />
+    }
     return (
         <div className="table-wrapper">
             <table className="expiry-table">
