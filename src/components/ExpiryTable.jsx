@@ -7,6 +7,7 @@ import {
     getExpiryStatus,
 } from '../utils/dateUtils'
 import EmptyState from './EmptyState'
+import ExpiryCard from './ExpiryCard'
 
 function ExpiryTable({
     items,
@@ -19,74 +20,87 @@ function ExpiryTable({
         return <EmptyState hasItems={totalItemCount > 0} />
     }
     return (
-        <div className="table-wrapper">
-            <table className="expiry-table">
-                <thead>
-                    <tr>
-                        <th>Item</th>
-                        <th>Category</th>
-                        <th>Expiry</th>
-                        <th>Days Left</th>
-                        <th>Cost</th>
-                        <th>Status</th>
-                        <th>
-                            <span className="sr-only">Actions</span>
-                        </th>
-                    </tr>
-                </thead>
+        <>
+            <div className="mobile-item-list">
+                {items.map((item) => (
+                    <ExpiryCard
+                        key={item.id}
+                        item={item}
+                        onEdit={onEdit}
+                        onDelete={onDelete}
+                    />
+                ))}
+            </div>
 
-                <tbody>
-                    {items.map((item) => {
-                        const daysLeft = calculateDaysLeft(item.expiryDate)
-                        const status = getExpiryStatus(item.expiryDate)
+            <div className="table-wrapper desktop-table">
+                <table className="expiry-table">
+                    <thead>
+                        <tr>
+                            <th>Item</th>
+                            <th>Category</th>
+                            <th>Expiry</th>
+                            <th>Days Left</th>
+                            <th>Cost</th>
+                            <th>Status</th>
+                            <th>
+                                <span className="sr-only">Actions</span>
+                            </th>
+                        </tr>
+                    </thead>
 
-                        return (
-                            <tr key={item.id}>
-                                <td className="item-name">{item.name}</td>
+                    <tbody>
+                        {items.map((item) => {
+                            const daysLeft = calculateDaysLeft(item.expiryDate)
+                            const status = getExpiryStatus(item.expiryDate)
 
-                                <td>{item.category}</td>
+                            return (
+                                <tr key={item.id}>
+                                    <td className="item-name">{item.name}</td>
 
-                                <td>{formatExpiryDate(item.expiryDate)}</td>
+                                    <td>{item.category}</td>
 
-                                <td>{formatDaysLeft(daysLeft)}</td>
+                                    <td>{formatExpiryDate(item.expiryDate)}</td>
 
-                                <td>
-                                    {item.renewalCost === null
-                                        ? '—'
-                                        : `RM ${item.renewalCost.toLocaleString('en-MY')}`}
-                                </td>
+                                    <td>{formatDaysLeft(daysLeft)}</td>
 
-                                <td>
-                                    <StatusBadge status={status} />
-                                </td>
+                                    <td>
+                                        {item.renewalCost === null
+                                            ? '—'
+                                            : `RM ${item.renewalCost.toLocaleString('en-MY')}`}
+                                    </td>
 
-                                <td>
-                                    <div className="table-actions">
-                                        <button
-                                            className="icon-button"
-                                            type="button"
-                                            onClick={() => onEdit(item)}
-                                            aria-label={`Edit ${item.name}`}
-                                        >
-                                            <Pencil size={17} />
-                                        </button>
+                                    <td>
+                                        <StatusBadge status={status} />
+                                    </td>
 
-                                        <button
-                                            className="icon-button danger"
-                                            type="button"
-                                            onClick={() => onDelete(item)}
-                                            aria-label={`Delete ${item.name}`}
-                                        >
-                                            <Trash2 size={17} />
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-                        )
-                    })}
-                </tbody>
-            </table>
-        </div>
+                                    <td>
+                                        <div className="table-actions">
+                                            <button
+                                                className="icon-button"
+                                                type="button"
+                                                onClick={() => onEdit(item)}
+                                                aria-label={`Edit ${item.name}`}
+                                            >
+                                                <Pencil size={17} />
+                                            </button>
+
+                                            <button
+                                                className="icon-button danger"
+                                                type="button"
+                                                onClick={() => onDelete(item)}
+                                                aria-label={`Delete ${item.name}`}
+                                            >
+                                                <Trash2 size={17} />
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            )
+                        })}
+                    </tbody>
+                </table>
+            </div>
+        </>
     )
 }
 

@@ -1,14 +1,38 @@
+import { useEffect } from 'react'
 import { TriangleAlert, X } from 'lucide-react'
+
+useEffect(() => {
+    const handleKeyDown = (event) => {
+        if (event.key === 'Escape') {
+            onCancel()
+        }
+    }
+
+    window.addEventListener('keydown', handleKeyDown)
+
+    return () => {
+        window.removeEventListener('keydown', handleKeyDown)
+    }
+}, [onCancel])
 
 function ConfirmDialog({ item, onCancel, onConfirm }) {
     return (
-        <div className="modal-backdrop" role="presentation">
+        <div
+            className="modal-backdrop"
+            role="presentation"
+            onMouseDown={(event) => {
+                if (event.target === event.currentTarget) {
+                    onCancel()
+                }
+            }}
+        >
             <section
                 className="confirm-dialog"
                 role="alertdialog"
                 aria-modal="true"
                 aria-labelledby="confirm-delete-title"
                 aria-describedby="confirm-delete-description"
+                onMouseDown={(event) => event.stopPropagation()}
             >
                 <div className="confirm-dialog-header">
                     <div className="confirm-icon">

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { X } from 'lucide-react'
 import { CATEGORIES } from '../data/categories'
 
@@ -13,6 +13,22 @@ function ExpiryForm({ onClose, onSubmit, initialData = null }) {
         recurrence: initialData?.recurrence ?? 'none',
     })
 
+    const [errors, setErrors] = useState({})
+
+    useEffect(() => {
+        const handleKeyDown = (event) => {
+            if (event.key === 'Escape') {
+                onClose()
+            }
+        }
+
+        window.addEventListener('keydown', handleKeyDown)
+
+        return () => {
+            window.removeEventListener('keydown', handleKeyDown)
+        }
+    }, [onClose])
+
     const handleChange = (event) => {
         const { name, value } = event.target
 
@@ -22,8 +38,39 @@ function ExpiryForm({ onClose, onSubmit, initialData = null }) {
         }))
     }
 
+    const validateForm = () => {
+        const newErrors = {}
+
+        if (!formData.name.trim()) {
+            newErrors.name = 'Item name is required.'
+        }
+
+        if (!formData.category) {
+            newErrors.category = 'Please select a category.'
+        }
+
+        if (!formData.expiryDate) {
+            newErrors.expiryDate = 'Expiry date is required.'
+        }
+
+        if (
+            formData.renewalCost !== '' &&
+            Number(formData.renewalCost) < 0
+        ) {
+            newErrors.renewalCost = 'Renewal cost cannot be negative.'
+        }
+
+        setErrors(newErrors)
+
+        return Object.keys(newErrors).length === 0
+    }
+
     const handleSubmit = (event) => {
         event.preventDefault()
+
+        if (!validateForm()) {
+            return
+        }
 
         const submittedItem = {
             ...initialData,
@@ -44,12 +91,21 @@ function ExpiryForm({ onClose, onSubmit, initialData = null }) {
     }
 
     return (
-        <div className="modal-backdrop" role="presentation">
+        <div
+            className="modal-backdrop"
+            role="presentation"
+            onMouseDown={(event) => {
+                if (event.target === event.currentTarget) {
+                    onClose()
+                }
+            }}
+        >
             <section
                 className="modal-card"
                 role="dialog"
                 aria-modal="true"
                 aria-labelledby="expiry-form-title"
+                onMouseDown={(event) => event.stopPropagation()}
             >
                 <div className="modal-header">
                     <div>
@@ -75,6 +131,7 @@ function ExpiryForm({ onClose, onSubmit, initialData = null }) {
                 <form className="expiry-form" onSubmit={handleSubmit}>
                     <div className="form-field">
                         <label htmlFor="name">Item Name</label>
+
                         <input
                             id="name"
                             name="name"
@@ -82,9 +139,14 @@ function ExpiryForm({ onClose, onSubmit, initialData = null }) {
                             placeholder="e.g. Car Insurance"
                             value={formData.name}
                             onChange={handleChange}
-                            required
+                            aria-invalid={Boolean(errors.name)}
                         />
+
+                        {errors.name && (
+                            <p className="form-error">{errors.name}</p>
+                        )}
                     </div>
+
 
                     <div className="form-field">
                         <label htmlFor="category">Category</label>
@@ -95,7 +157,11 @@ function ExpiryForm({ onClose, onSubmit, initialData = null }) {
                             value={formData.category}
                             onChange={handleChange}
                             required
+                            aria-invalid={Boolean(errors.category)}
                         >
+                            {errors.category && (
+                                <p className="form-error">{errors.category}</p>
+                            )}
                             <option value="" disabled>
                                 Select category
                             </option>
@@ -118,7 +184,11 @@ function ExpiryForm({ onClose, onSubmit, initialData = null }) {
                             value={formData.expiryDate}
                             onChange={handleChange}
                             required
+                            aria-invalid={Boolean(errors.expiryDate)}
                         />
+                        {errors.expiryDate && (
+                            <p className="form-error">{errors.expiryDate}</p>
+                        )}
                     </div>
 
                     <div className="form-field">
@@ -140,6 +210,9 @@ function ExpiryForm({ onClose, onSubmit, initialData = null }) {
                                 value={formData.renewalCost}
                                 onChange={handleChange}
                             />
+                            {errors.renewalCost && (
+                                <p className="form-error">{errors.renewalCost}</p>
+                            )}
                         </div>
                     </div>
 
