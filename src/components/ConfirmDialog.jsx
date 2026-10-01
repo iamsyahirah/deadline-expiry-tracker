@@ -1,21 +1,21 @@
 import { useEffect } from 'react'
 import { TriangleAlert, X } from 'lucide-react'
 
-useEffect(() => {
-    const handleKeyDown = (event) => {
-        if (event.key === 'Escape') {
-            onCancel()
-        }
-    }
-
-    window.addEventListener('keydown', handleKeyDown)
-
-    return () => {
-        window.removeEventListener('keydown', handleKeyDown)
-    }
-}, [onCancel])
-
 function ConfirmDialog({ item, onCancel, onConfirm }) {
+    useEffect(() => {
+        const handleKeyDown = (event) => {
+            if (event.key === 'Escape') {
+                onCancel()
+            }
+        }
+
+        window.addEventListener('keydown', handleKeyDown)
+
+        return () => {
+            window.removeEventListener('keydown', handleKeyDown)
+        }
+    }, [onCancel])
+
     return (
         <div
             className="modal-backdrop"
