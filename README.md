@@ -1,16 +1,75 @@
-# React + Vite
+# Deadline — Personal Expiry Tracker
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Deadline is a lightweight React application for tracking important expiry and renewal dates in one place.
 
-Currently, two official plugins are available:
+It is designed for items such as:
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- Road tax
+- Insurance
+- Passport
+- Driving licence
+- Domains
+- Hosting
+- Subscriptions
+- Memberships
+- Warranties
+- Certifications
 
-## React Compiler
+## Problem
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+Important expiry and renewal information is often scattered across emails, documents, apps, and physical records.
 
-## Expanding the ESLint configuration
+This makes it easy to forget when something needs to be renewed.
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+Deadline provides a single dashboard where users can monitor upcoming expiry dates, renewal costs, and items that require attention.
+
+## Features
+
+- Add expiry items
+- Edit existing items
+- Delete items with confirmation
+- Automatic days-left calculation
+- Automatic status:
+  - Active
+  - Expiring Soon
+  - Expired
+- Search by item name or category
+- Filter by status
+- Sort by expiry date
+- Renewal cost tracking
+- Monthly and yearly recurrence metadata
+- Upcoming renewal cost summary
+- Needs Attention section
+- localStorage persistence
+- Responsive desktop and mobile layouts
+- Empty states
+- Form validation
+- Accessible modal interactions
+
+## Tech Stack
+
+- React
+- Vite
+- JavaScript
+- CSS
+- Lucide React
+- localStorage
+
+## Architecture
+
+The application uses a simple client-side architecture suitable for the MVP.
+
+`App.jsx` manages the main application state, while UI responsibilities are split into reusable components.
+
+Business logic such as expiry status and date calculations is separated into utility functions.
+
+Example structure:
+
+```text
+src/
+├── components/
+├── data/
+├── utils/
+├── App.jsx
+├── main.jsx
+└── index.css
